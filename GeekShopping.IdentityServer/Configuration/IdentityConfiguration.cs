@@ -31,14 +31,14 @@ namespace GeekShopping.IdentityServer.Configuration
                 new Client
                 {
                     ClientId = "client",
-                    ClientSecrets = {new Secret("my_super_secrete".Sha256())},
+                    ClientSecrets = {new Secret("my_super_secret".Sha256())},
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
                     AllowedScopes = {"read", "write", "profile"}
                 },
                 new Client
                 {
                     ClientId = "geek_shopping",
-                    ClientSecrets = {new Secret("my_super_secrete".Sha256())},
+                    ClientSecrets = {new Secret("my_super_secret".Sha256())},
                     AllowedGrantTypes = GrantTypes.Code,
                     RedirectUris= {"https://localhost:4430/signin-oidc"},
                     PostLogoutRedirectUris={"https://localhost:4430/signout-callback-oidc"},
