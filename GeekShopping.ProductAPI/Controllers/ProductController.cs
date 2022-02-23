@@ -20,7 +20,6 @@ namespace GeekShopping.ProductAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize] //Verifica se tem autorização para acessar esse recurso
         public async Task<ActionResult<IEnumerable<ProductVO>>> FindAll()
         {
             var product = await _repository.FindAll();
@@ -28,7 +27,7 @@ namespace GeekShopping.ProductAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize] //Verifica se tem autorização para acessar esse recurso
         public async Task<ActionResult<ProductVO>> FindById(long id)
         {
             var product = await _repository.FindById(id);
