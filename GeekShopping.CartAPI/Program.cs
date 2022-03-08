@@ -4,6 +4,7 @@ using GeekShopping.CartAPI.Model.Context;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using GeekShopping.CartAPI.Config;
+using GeekShopping.CartAPI.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,7 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
-//builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<iCartRepository, CartRepository>();
 
 
 // Add services to the container.
