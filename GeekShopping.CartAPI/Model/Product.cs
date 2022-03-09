@@ -31,7 +31,7 @@ namespace GeekShopping.CartAPI.Model
 
         [Column("image_url")]
         [StringLength(300)]
-        public string ImageURL { get; set; }
+        public string Image_URL { get; set; }
 
     }
 }
