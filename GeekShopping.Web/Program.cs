@@ -6,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddAuthentication(options => {
+builder.Services.AddAuthentication(options =>
+{
 
     options.DefaultScheme = "Cookies";
     options.DefaultChallengeScheme = "oidc";
@@ -39,10 +40,10 @@ builder.Services.AddHttpClient<ICartService, CartService>(c =>
     c.BaseAddress = new Uri(config2)
 );
 
-//var config3 = builder.Configuration["ServiceUrls:CouponAPI"];
-//builder.Services.AddHttpClient<ICouponService, CouponService>(c =>
-//    c.BaseAddress = new Uri(config3)
-//);
+var config3 = builder.Configuration["ServiceUrls:CouponAPI"];
+builder.Services.AddHttpClient<ICouponService, CouponService>(c =>
+    c.BaseAddress = new Uri(config3)
+);
 
 var app = builder.Build();
 
