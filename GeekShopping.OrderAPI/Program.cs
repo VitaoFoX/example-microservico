@@ -1,11 +1,7 @@
-using AutoMapper;
+using GeekShopping.OrderAPI.Model.Context;
 using Microsoft.EntityFrameworkCore;
-using GeekShopping.CartAPI.Model.Context;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using GeekShopping.CartAPI.Config;
-using GeekShopping.CartAPI.Repository;
-using GeekShopping.CartAPI.RabbitMQSender;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,15 +18,10 @@ UseMySql(connection,
             new MySqlServerVersion(
                      new Version(8, 0, 25))));
 
-// Aqui faz o mapper das classes pro VO
-IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
-builder.Services.AddSingleton(mapper);
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//builder.Services.AddScoped<iCartRepository, CartRepository>();
 
-builder.Services.AddScoped<iCartRepository, CartRepository>();
-
-builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
+//builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
 
 
 // Add services to the container.
