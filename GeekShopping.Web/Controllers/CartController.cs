@@ -12,11 +12,14 @@ namespace GeekShopping.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IProductService _productService;
         private readonly ICartService _cartService;
+        private readonly ICouponService _couponService;
 
-        public CartController(IProductService productService, ICartService cartService)
+        public CartController(IProductService productService, ICartService cartService, ICouponService couponService)
         {
             _productService = productService;
             _cartService = cartService;
+            _couponService = couponService; 
+
         }
 
         [Authorize]
@@ -32,11 +35,11 @@ namespace GeekShopping.Web.Controllers
             var token = await HttpContext.GetTokenAsync("access_token");
             var userId = User.Claims.Where(u => u.Type == "sub")?.FirstOrDefault()?.Value;
 
-            var coupon = model.CartHeader.CouponCode;
+            //var coupon = model.CartHeader.CouponCode;
 
-            model = await _cartService.FindCartByUserID(userId, token); // Consulto novamente para pegar o Cartdetails
+            //model = await _cartService.FindCartByUserID(userId, token); // Consulto novamente para pegar o Cartdetails
 
-            model.CartHeader.CouponCode = coupon;   
+            //model.CartHeader.CouponCode = coupon;   
 
             var response = await _cartService.ApplyCoupon(model, token);
 
@@ -80,6 +83,33 @@ namespace GeekShopping.Web.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Checkout()
+        {
+            return View(await FindUserCart());
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> Checkout(CartViewModel model)
+        {
+            var token = await HttpContext.GetTokenAsync("access_token");
+            
+            var response = await _cartService.Checkout(model.CartHeader, token);
+
+            if (response != null)
+            {
+                return RedirectToAction(nameof(Confirmation));
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Confirmation()
+        {
+            return View();
+        }
+
         private async Task<CartViewModel> FindUserCart()
         {
             var token = await HttpContext.GetTokenAsync("access_token");
@@ -88,10 +118,28 @@ namespace GeekShopping.Web.Controllers
             var response = await _cartService.FindCartByUserID(userId, token);
             if (response?.CartHeader != null)
             {
+                //Verifica se o coupon nao esta nulo nem vazio
+                if(!string.IsNullOrEmpty(response.CartHeader.CouponCode))
+                {
+                    //Retorna o objeto coupon
+                    var coupon = await _couponService.
+                        GetCoupon(response.CartHeader.CouponCode, token);
+
+                    if(coupon?.CouponCode != null )
+                    {
+                        response.CartHeader.DiscountAmount = coupon.DiscountAmount;
+                    }
+
+                }
+
                 foreach (var detail in response.CartDetails)
                 {
                     response.CartHeader.PurchaseAmount += (detail.Product.Price * detail.Count);
                 }
+
+                //Aplicando o desconto
+                response.CartHeader.PurchaseAmount -= response.CartHeader.DiscountAmount;
+
             }
 
             return response;
