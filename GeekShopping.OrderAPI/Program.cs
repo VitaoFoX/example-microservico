@@ -1,3 +1,5 @@
+using GeekShopping.CartAPI.Repository;
+using GeekShopping.OrderAPI.MessageConsumer;
 using GeekShopping.OrderAPI.Model.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,7 +21,14 @@ UseMySql(connection,
                      new Version(8, 0, 25))));
 
 
-//builder.Services.AddScoped<iCartRepository, CartRepository>();
+/*/Singleton para não correr o risco de executar duas vezes (So tem uma instancia executando)*/
+var builderDB = new DbContextOptionsBuilder<MySQLContext>();
+builderDB.UseMySql(connection, new MySqlServerVersion(
+                     new Version(8, 0, 25)));
+
+builder.Services.AddSingleton(new OrderRepository(builderDB.Options));
+
+builder.Services.AddHostedService<RabbitMQCheckoutConsumer>();
 
 //builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
 
