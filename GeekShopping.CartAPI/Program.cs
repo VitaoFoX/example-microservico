@@ -29,8 +29,13 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
 builder.Services.AddScoped<iCartRepository, CartRepository>();
+builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 
 builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
+
+//Injetando a api de coupon na classe
+var connection2 = builder.Configuration["ServiceUrls:CouponAPI"];
+builder.Services.AddHttpClient<ICouponRepository, CouponRepository>(s => s.BaseAddress = new Uri(connection2));
 
 
 // Add services to the container.

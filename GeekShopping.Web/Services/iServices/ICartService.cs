@@ -14,7 +14,7 @@ namespace GeekShopping.Web.Services
         Task<bool>RemoveCoupon(string userID, string token);  
         Task<bool> ClearCart(string userID, string token);  
 
-        Task<CartHeaderViewModel> Checkout(CartHeaderViewModel cartHeader, string token);  
+        Task<object> Checkout(CartHeaderViewModel cartHeader, string token);  
 
     }
 }
