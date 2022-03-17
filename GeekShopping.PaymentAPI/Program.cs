@@ -1,42 +1,17 @@
-using GeekShopping.CartAPI.Repository;
-using GeekShopping.OrderAPI.MessageConsumer;
-using GeekShopping.OrderAPI.Model.Context;
-using GeekShopping.OrderAPI.RabbitMQSender;
-using Microsoft.EntityFrameworkCore;
+using GeekShopping.PaymentAPI.MessageConsumer;
+using GeekShopping.PaymentAPI.RabbitMQSender;
+using GeekShopping.PaymentProcessor;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-
-var connection = builder.Configuration["MySQLConnection:MySQLConnectionString"];
-builder.Services.AddDbContext<MySQLContext>(options => options.
-UseMySql(connection,
-            new MySqlServerVersion(
-                     new Version(8, 0, 25))));
-
-
-/*/Singleton para não correr o risco de executar duas vezes (So tem uma instancia executando)*/
-var builderDB = new DbContextOptionsBuilder<MySQLContext>();
-builderDB.UseMySql(connection, new MySqlServerVersion(
-                     new Version(8, 0, 25)));
-
-builder.Services.AddSingleton(new OrderRepository(builderDB.Options));
-
-builder.Services.AddHostedService<RabbitMQCheckoutConsumer>();
-builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
+//Sempre injetar dependencia antes do AddControllers
+//RabbitMQMessageSender
+builder.Services.AddSingleton<IProcessPayment, ProcessPayment>();
 builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
-
-//builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
-
-
-// Add services to the container.
+builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
 
 builder.Services.AddControllers();
 
@@ -100,7 +75,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
